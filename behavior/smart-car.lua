@@ -58,84 +58,60 @@ SmartCar = {
   --  Car control operations
   -- --------------------------------------------------
 
+  ride = function( self, acceleration, direction )
+    self.driver.riding_state = {
+      acceleration = acceleration or defines.riding.acceleration.accelerating,
+      direction = direction or defines.riding.direction.straight
+    }
+  end,
+
   ---
   --- Runs the car
   ---
   accelerate = function( self, direction )
-    self.driver.riding_state = {
-      acceleration = defines.riding.acceleration.accelerating,
-      direction = direction or defines.riding.direction.straight
-    }
+    return self:ride( defines.riding.acceleration.accelerating, direction )
   end,
 
   ---
   --- Brakes the car
   ---
   brake = function( self, direction )
-    self.driver.riding_state = {
-      acceleration = defines.riding.acceleration.braking,
-      direction = direction or defines.riding.direction.straight
-    }
+    return self:ride( defines.riding.acceleration.braking, direction )
   end,
 
   ---
   --- Runs the car backwards
   ---
   reverse = function( self, direction )
-    self.driver.riding_state = {
-      acceleration = defines.riding.acceleration.reversing,
-      direction = direction or defines.riding.direction.straight
-    }
+    return self:ride( defines.riding.acceleration.reversing, direction )
   end,
 
   ---
   --- Turns off the engine
   ---
   coast = function( self, direction )
-    self.driver.riding_state = {
-      acceleration = defines.riding.acceleration.nothing,
-      direction = direction or defines.riding.direction.straight
-    }
+    return self:ride( defines.riding.acceleration.nothing, direction )
   end,
 
   ---
   --- Turns weels to a given direction keeping current accelerating status
   ---
   turn = function( self, direction )
-    self.driver.riding_state = {
-      acceleration = self.driver.riding_state.acceleration,
-      direction = direction
-    }
+    return self:ride( self.driver.riding_state.acceleration, direction )
   end,
 
   ---
   --- Turns weels left keeping current accelerating status
   ---
   turn_left = function( self )
-    self.driver.riding_state = {
-      acceleration = self.driver.riding_state.acceleration,
-      direction = defines.riding.direction.left
-    }
+    return self:turn( defines.riding.direction.left )
   end,
 
   ---
   --- Turns weels right keeping current accelerating status
   ---
   turn_right = function( self )
-    self.driver.riding_state = {
-      acceleration = self.driver.riding_state.acceleration,
-      direction = defines.riding.direction.right
-    }
-  end,
-
-  ---
-  --- Turns weels straight keeping current accelerating status
-  ---
-  keep_straight = function( self )
-    self.driver.riding_state = {
-      acceleration = self.driver.riding_state.acceleration,
-      direction = defines.riding.direction.straight
-    }
+    return self:turn( defines.riding.direction.right )
   end,
 
   ---
@@ -150,7 +126,7 @@ SmartCar = {
   --- Calculates the rotation direction to turn towards the 'target_position'
   ---
   get_rotation_towards = function( self, target_position )
-    return math2.get_rotation_direction( self:get_orientation_delta( target_position ) )
+    return math2.rotation_direction( self:get_orientation_delta( target_position ) )
   end,
 
   ---
@@ -165,24 +141,56 @@ SmartCar = {
   -- --------------------------------------------------
 
   tank_follow = function( self )
-
     local target = game.player.position
     local delta = self:get_orientation_delta( target )
-    local abs_delta = math.abs(delta)
-    local direction = math2.get_rotation_direction( delta )
+    local direction = math2.rotation_direction( delta )
+    local speed = self.car.speed
 
-    if abs_delta < 0.16 then
-      self:accelerate( direction )
-    elseif abs_delta < 0.33 then
-      self:coast( direction )
-    else
+    if util.distance( self.car.position, target ) <= (speed*speed*2/self.calibration.braking) + math.abs(self.car.prototype.collision_box.left_top.y) + 2 then
       self:brake( direction )
+    else
+      local abs_delta = math.abs(delta)
+      if abs_delta < 0.16 then
+        self:accelerate( direction )
+      elseif abs_delta < 0.33 then
+        self:coast( direction )
+      else
+        self:brake( direction )
+      end
     end
   end,
 
   car_follow = function( self )
-    local direction = self:get_rotation_towards( game.player.position )
-    self:accelerate( direction )
+    local target = game.player.position
+    local delta = self:get_orientation_delta( target )
+    local abs_delta = math.abs(delta)
+    local direction = math2.rotation_direction( delta )
+    local speed = self.car.speed
+
+    if util.distance( self.car.position, target ) <= (speed*speed*2/self.calibration.braking) + math.abs(self.car.prototype.collision_box.left_top.y) + 2 then
+      self:brake( direction )
+    else
+      if self.car.speed < 0 then
+        delta = delta > 0 and 1 - delta or 1 + delta
+        direction = math2.opposite_direction( math2.rotation_direction ( delta ) )
+      end
+
+      if self.car.speed == 0 then
+        if abs_delta < 0.5 then
+          self:accelerate( direction )
+        else
+          self:reverse( direction )
+        end
+      else
+        if abs_delta < 0.16 then
+          self:accelerate( direction )
+        elseif abs_delta < 0.33 then
+          self:coast( direction )
+        else
+          self:reverse( direction )
+        end
+      end
+    end
   end,
 
   enable_follow_mode = function ( self )

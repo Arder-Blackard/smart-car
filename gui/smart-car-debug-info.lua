@@ -35,7 +35,7 @@ function update_debug_info( event )
   end
 
   flow.tick_display.caption = "tick: " .. tostring( event.tick )
-  flow.smart_cars.caption = "smart_cars: " .. debug_info.get_smart_cars_count()
+  flow.smart_cars.caption = "smart_cars: " .. debug_info.get_smart_cars_info()
   flow.orientation.caption = "orientation: " .. (game.player.vehicle and game.player.vehicle.orientation or "undefined")
   flow.position.caption = "position: " .. util.positiontostr( game.player.position )
   if game.player.selected then
@@ -45,11 +45,17 @@ function update_debug_info( event )
 end
 
 
-function debug_info.get_smart_cars_count()
+function debug_info.get_smart_cars_info()
     local cars_names = {}
-    for i,car in ipairs( global.smart_cars ) do
-      if car.valid then
-        table.insert( cars_names, table.concat( { car.name, " {", car.position.x,",", car.position.y, "}"}, "" ) )
+    for _, smart_car in ipairs( global.smart_cars ) do
+      local c = smart_car.car
+      if c.valid then
+        table.insert( cars_names, table.concat( { c.name, " {", c.position.x,",", c.position.y, "},",
+                                                  " speed: ", c.speed,
+                                                  ", ", debug_info.format_riding( smart_car.car.passenger ),
+                                                  ", ", debug_info.format_approaching( smart_car )
+                                                },
+                                                "" ) )
       end
     end
     return table.concat( cars_names, ", " )
@@ -58,7 +64,7 @@ end
 
 function debug_info.get_orientation()
     local cars_names = {}
-    for k,car in pairs( game.entity_prototypes ) do
+    for _,car in pairs( game.entity_prototypes ) do
       if car.type == "car" then
         table.insert( cars_names, table.concat( { car.name, " [" , car.type, "]" } ) )
       end
@@ -72,7 +78,7 @@ function debug_info.get_calibrations()
     end
 
     local calibrations = {}
-    for k,c in pairs( global.smart_car_calibrations ) do
+    for _,c in pairs( global.smart_car_calibrations ) do
       table.insert( calibrations, table.concat( { c.car_name, " [" , c.calibration_status, "]" } ) )
     end
     return table.concat( calibrations, ", " )
@@ -84,4 +90,46 @@ function debug_info.format_position()
     str = str .. tostring( k ) .. ": " .. tostring( v ) .. ", "
   end
   return str
+end
+
+function debug_info.format_approaching( smart_car )
+
+  if not smart_car.calibration or not smart_car.calibration.braking then
+    return "uncalibrated"
+  else
+    return " {dist: " .. util.distance( smart_car.car.position, game.player.position ) ..
+           ", appr: " .. (smart_car.car.speed*smart_car.car.speed/2/smart_car.calibration.braking) ..
+           "}"
+  end
+end
+
+function debug_info.format_riding( player )
+  if not player.riding_state then
+    return "[ : ]"
+  end
+
+  local result = "["
+  local acceleration = player.riding_state.acceleration
+  if acceleration == defines.riding.acceleration.accelerating then
+    result = result .. " acc :"
+  elseif acceleration == defines.riding.acceleration.braking then
+    result = result .. " brk :"
+  elseif acceleration == defines.riding.acceleration.reversing then
+    result = result .. " rev :"
+  elseif acceleration == defines.riding.acceleration.nothing then
+    result = result .. " nth :"
+  else
+    result = result .. " :"
+  end
+  local direction = player.riding_state.direction
+  if direction == defines.riding.direction.straight then
+    result = result .. " str ]"
+  elseif direction == defines.riding.direction.left then
+    result = result .. " lft ]"
+  elseif direction == defines.riding.direction.right then
+    result = result .. " rgt ]"
+  else
+    result = result .. " ]"
+  end
+  return result
 end

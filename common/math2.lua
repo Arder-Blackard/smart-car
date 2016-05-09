@@ -10,11 +10,11 @@ math2 = {
   ---
   --- Detects the orientation of a vector 'from' -> 'to'
   ---
-  orientation = function( from, to )
+  orientation = function ( from, to )
     return 0.5 - math.atan2( to.x - from.x, to.y - from.y ) * math2.scale;
   end,
 
-  orientation_delta = function( source_orientation, target_orientation )
+  orientation_delta = function ( source_orientation, target_orientation )
     local delta = target_orientation - source_orientation
     if delta > 0.5 then
       delta = delta - 1
@@ -24,11 +24,11 @@ math2 = {
     return delta
   end,
 
-  orientation_to_radians = function( orientation )
+  orientation_to_radians = function ( orientation )
     return orientation * 6.2831853071795864769
   end,
 
-  get_rotation_direction = function( orientation_delta, epsilon )
+  rotation_direction = function ( orientation_delta, epsilon )
     epsilon = epsilon or 0.05
     if orientation_delta < epsilon and orientation_delta > -epsilon then
       return defines.riding.direction.straight
@@ -39,6 +39,20 @@ math2 = {
     end
   end,
 
+  opposite_direction = function ( direction )
+    if direction == defines.riding.direction.left then
+      return defines.riding.direction.right
+    elseif direction == defines.riding.direction.right then
+      return defines.riding.direction.left
+    else
+      return direction
+    end
+  end,
 
+  distance_sqr = function ( from, to )
+    local dx = from.x - to.x
+    local dy = from.y - to.y
+    return dx * dx + dy * dy
+  end
 }
 
