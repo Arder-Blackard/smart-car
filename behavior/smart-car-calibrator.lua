@@ -43,27 +43,19 @@ SmartCarCalibrator = {
       function()
         self.smart_car:accelerate()
       end,
-      1,
+      4,
       function()
-        self.calibration.acceleration = self.smart_car.car.speed
+        self.calibration.acceleration = self.smart_car.car.speed / 4
       end,
+      4,
       function()
---        self.calibration.max_speed = self.speed
---        if self.speed ~= self.smart_car.car.speed then
---          self.speed = self.smart_car.car.speed
---          return 1
---        end
-      end,
-      function()
+        self.initial_speed = self.smart_car.car.speed
         self.smart_car:brake()
       end,
-      5,
+      4,
       function()
-      end
+        self.calibration.braking = (self.initial_speed - self.smart_car.car.speed) / 4
+      end,
     }
-  end,
-
-
-  finish = function ( self )
   end,
 }

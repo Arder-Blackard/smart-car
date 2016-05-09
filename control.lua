@@ -1,5 +1,6 @@
 require "defines"
 require "behavior.smart-car"
+require "behavior.smart-car-collection"
 require "behavior.smart-car-control"
 require "behavior.smart-car-calibration"
 require "gui.smart-car-gui"
@@ -55,7 +56,7 @@ function init_smart_cars_mod()
     end
   )
 
-  event_manager.on_tick( update_debug_info, 10 )
+  event_manager.on_tick( 10, update_debug_info )
 end
 
 -----------------------------------

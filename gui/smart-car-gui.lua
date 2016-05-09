@@ -47,7 +47,7 @@ smart_car_calibrations_gui = {
     self.calibration = smart_car.calibration
     self.frame = parent.add { type = "frame", name = "calibration_frame", direction = "vertical", caption = "Calibration" }
     self:compose_objects()
-    self.tick_handler = event_manager.on_tick( function() self:update() end, 11 )
+    self.tick_handler = event_manager.on_tick( 11, function() self:update() end )
   end,
 
   ---
@@ -62,7 +62,7 @@ smart_car_calibrations_gui = {
 
     frame.add { type = "label", name = "tank_driving", caption = "Tank driving: " }
     frame.add { type = "label", name = "acceleration", caption = "Acceleration: " }
-    frame.add { type = "label", name = "max_speed", caption = "Max speed: " }
+    frame.add { type = "label", name = "braking", caption = "Braking: " }
   end,
 
   ---
@@ -85,7 +85,7 @@ smart_car_calibrations_gui = {
     frame.calibration_status.caption = "Calibration status: " .. format_calibration_status( self.calibration.calibration_status )
     frame.tank_driving.caption = "Tank driving: " .. format_bool_string( self.calibration.tank_driving )
     frame.acceleration.caption = "Acceleration: " .. format_per_tick_value( self.calibration.acceleration )
-    frame.max_speed.caption = "Max speed: " .. format_per_tick_value( self.calibration.max_speed )
+    frame.braking.caption = "Braking: " .. format_per_tick_value( self.calibration.braking )
   end,
 
   ---
@@ -118,7 +118,7 @@ smart_car_gui = {
   --- Creates SmartCar GUI window
   ---
   compose_objects = function( self )
-    self.window = self.smart_car.player.gui.center.add {
+    self.window = self.smart_car.player.gui.left.add {
       type = "frame",
       name = "smart_car_window",
       caption = "Smart Car Manager",
@@ -135,7 +135,7 @@ smart_car_gui = {
     event_manager.on_gui_click( "follow_mode", function() self.smart_car:set_mode( SmartCar.mode.follow ) end )
 
     self.window.add { type = "button", name = "close_button", caption = "Close" }
-    self.tick_handler = event_manager.on_tick( function() self:update() end, 10 )
+    self.tick_handler = event_manager.on_tick( 11, function() self:update() end)
     event_manager.on_gui_click( "close_button", function() self:disable() end )
   end,
 

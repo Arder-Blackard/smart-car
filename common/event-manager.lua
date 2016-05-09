@@ -113,7 +113,7 @@ event_manager = {
   ---
   on = function ( event, handler )
 
-    prnt( "Subscribing to event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
+--    prnt( "Subscribing to event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
 
     --  Perform checks
 
@@ -153,9 +153,12 @@ event_manager = {
   ---
   --- Subscribes 'handler' to receive notifications about the 'on_tick'
   ---
-  on_tick = function( handler, interval )
-    prnt( "Subscribing to on_tick, handler: " .. tostring( handler ) .. ", interval: " .. tostring( interval ) )
-    interval = interval or 1
+  on_tick = function( interval, handler )
+--    prnt( "Subscribing to on_tick, handler: " .. tostring( handler ) .. ", interval: " .. tostring( interval ) )
+    if type (interval) == "function" then
+      handler = interval
+      interval = 1
+    end
     if not handler then
       prnt( "No handler to subscribe to an event" )
       return
@@ -167,8 +170,11 @@ event_manager = {
   ---
   --- Subscribes 'handler' to receive notifications about the 'on_tick'
   ---
-  execute_later = function( handler, interval )
-    interval = interval or 1
+  execute_later = function( interval, handler )
+    if type( interval ) == "function" then
+      handler = interval
+      interval = 1
+    end
     if not handler then
       prnt( "No handler to subscribe to an event" )
       return
@@ -206,18 +212,15 @@ event_manager = {
   --- Subscribes 'handler' to receive notifications about the 'on_gui_click'
   ---
   on_gui_click = function( element_name, handler )
-    prnt( "Subscribing to 'on_gui_click', element_name: " .. element_name .. ", handler: " .. tostring( handler ) )
-
+--    prnt( "Subscribing to 'on_gui_click', element_name: " .. element_name .. ", handler: " .. tostring( handler ) )
     if not element_name then
       prnt( "No element_name to subscribe to" )
       return
     end
-
     if not handler then
       prnt( "No handler to subscribe to an event" )
       return
     end
-
     named_gui_click_handlers[element_name] = handler
   end,
 
@@ -227,7 +230,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'event' notifications
   ---
   clear = function ( event, handler )
-    prnt( "Unsubscribing from event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
+--    prnt( "Unsubscribing from event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
     local handlers = other_handlers[event]
     if handlers then
       array_remove( handlers, handler )
@@ -238,7 +241,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'on_tick' notifications
   ---
   clear_on_tick = function ( handler )
-    prnt( "Unsubscribing from 'on_tick', handler: " .. tostring( handler ) )
+--    prnt( "Unsubscribing from 'on_tick', handler: " .. tostring( handler ) )
     for index, tick_handler in ipairs( tick_handlers ) do
       if tick_handler.handler == handler then
         table.remove( tick_handlers, index )
@@ -250,7 +253,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'on_gui_click' notifications
   ---
   clear_on_gui_click = function ( element_name )
-    prnt( "Unsubscribing from 'on_gui_click', element_name: " .. tostring( element_name ) )
+--    prnt( "Unsubscribing from 'on_gui_click', element_name: " .. tostring( element_name ) )
     named_gui_click_handlers[ element_name ] = nil
   end,
 
