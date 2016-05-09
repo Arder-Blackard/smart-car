@@ -1,0 +1,7 @@
+{
+    "name": "smart-car-control",
+    "version": "0.0.1",
+    "title": "Smart car controller",
+    "author": "Arder Blackard",
+    "dependencies": [ "base >= 0.12.0" ]
+}
