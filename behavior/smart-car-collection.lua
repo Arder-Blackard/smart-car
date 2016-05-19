@@ -62,7 +62,7 @@ SmartCarsCollection = {
     end
 
     --  Init a new SmartCar
-    local smart_car = SmartCar:create( car, player )
+    local smart_car = SmartCar:new( car, player )
     table.insert( self, smart_car )
     return smart_car
   end,
@@ -71,14 +71,12 @@ SmartCarsCollection = {
   --- Removes a car and disables it's smart logic
   ---
   remove = function ( self, car )
-
     local smart_car, index = self:find( car )
     if not smart_car then
       prnt( "Cannot find the smart car" )
       return false
     end
-
-    smart_car.driver.destroy()
+    smart_car:dispose()
     table.remove( self, index )
     return true
 
@@ -88,9 +86,10 @@ SmartCarsCollection = {
   --- Clears all SmartCars describing cars that are not valid anymore
   ---
   remove_invalid_cars = function ( self )
-    for index, smart_car in ipairs( self ) do
+    for index = #self, 1, -1 do
+      local smart_car = self[index]
       if not smart_car.car.valid then
-        smart_car:destroy()
+        smart_car:dispose()
         table.remove( self, index )
       end
     end

@@ -13,9 +13,12 @@ require "common.event-manager"
 ---
 function init_smart_cars_mod()
 
-  --  Create data structures
+  --  new data structures
   global.smart_cars = SmartCarsCollection:restore( global.smart_cars )
   global.smart_car_calibrations = SmartCarCalibrationsCollection:restore( global.smart_car_calibrations )
+  global.smart_car_gui = SmartCarGui:new( global.smart_car_gui )
+
+  SmartCarCalibratorsCollection:new()
 
   event_manager.init()
 
@@ -24,6 +27,7 @@ function init_smart_cars_mod()
     function ( event )
       if event.created_entity.name == "smart-car-controller" then
         smart_car_controller_placed( event.created_entity, game.get_player( event.player_index ) )
+
       end
     end
   )
@@ -50,13 +54,15 @@ function init_smart_cars_mod()
     defines.events.on_entity_died,
     function( event )
       local entity = event.entity
+      prnt( "Entity died: " .. entity.type .. ( entity.valid and "[valid]" or "[invalid]" ) .. ", passenger: " .. (entity.type == "car" and ( entity.passenger and entity.passenger.name or "nil" ) or "invalid" ) )
       if entity.type == "car" and entity.passenger and entity.passenger.name == "smart-car-driver" then
+        global.smart_cars:remove( entity )
         global.smart_cars:remove_invalid_cars()
       end
     end
   )
 
-  event_manager.on_tick( 10, update_debug_info )
+  event_manager.on_tick( 1, update_debug_info )
 end
 
 -----------------------------------
@@ -79,6 +85,8 @@ script.on_event(
     player.insert( {name = "tank", count = 1} )
     player.insert( {name = "smart-car-controller-item", count = 1} )
     player.insert( {name = "solid-fuel", count = 50} )
+    player.insert( {name = "combat-shotgun", count = 1} )
+    player.insert( {name = "piercing-shotgun-shell", count = 50} )
   end
 )
 

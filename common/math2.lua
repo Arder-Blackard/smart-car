@@ -29,7 +29,7 @@ math2 = {
   end,
 
   rotation_direction = function ( orientation_delta, epsilon )
-    epsilon = epsilon or 0.05
+    epsilon = epsilon or 0.01
     if orientation_delta < epsilon and orientation_delta > -epsilon then
       return defines.riding.direction.straight
     elseif orientation_delta > 0 then
@@ -53,6 +53,22 @@ math2 = {
     local dx = from.x - to.x
     local dy = from.y - to.y
     return dx * dx + dy * dy
+  end,
+
+  point_along_orientation = function ( position, orientation, distance )
+    local angle = math2.orientation_to_radians( orientation )
+    return {
+      x = position.x + distance * math.sin( angle ),
+      y = position.y - distance * math.cos( angle )
+    }
+  end,
+
+  reverse_orientation = function( orientation )
+    if orientation > 0.5 then
+      return orientation - 0.5
+    else
+      return orientation + 0.5
+    end
   end
 }
 

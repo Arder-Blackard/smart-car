@@ -26,9 +26,10 @@ SmartCarCalibration = {
   ---
   --- Creates a new SmartCarCalibration object for the 'car_name'
   ---
-  create = function ( self, car_name )
+  new = function ( self, car_name )
     local calibration = {
       car_name = car_name,
+      braking_correction = math.abs(game.entity_prototypes[car_name].collision_box.left_top.y) + 2,
       calibration_status = SmartCarCalibration.status.not_calibrated
     }
     self.__index = self
@@ -55,7 +56,7 @@ SmartCarCalibrationsCollection = {
   end,
 
   __index = function( table, car_name)
-    local calibration = SmartCarCalibration:create( car_name )
+    local calibration = SmartCarCalibration:new( car_name )
     table[car_name] = calibration
     return calibration
   end

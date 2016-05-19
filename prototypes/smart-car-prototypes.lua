@@ -38,6 +38,21 @@ local entity = {
   minable = { mining_time = 0.1, result = "smart-car-controller-item" }
 }
 
+local mark = {
+  type = "decorative",
+  name = "mark",
+  icon = "__smart-car-control__/graphics/entities/shoot.png",
+  flags = { "placeable-neutral", "placeable-off-grid", "not-on-map" },
+  collision_mask = { "not-colliding-with-itself" },
+  subgroup = "grass",
+  order = "b[decorative]-b[smart-car-controller]",
+  collision_box = { { -0.4, -0.4 }, { 0.4, 0.4 } },
+  selection_box = { { -0.5, -0.5 }, { 0.5, 0.5 } },
+  selectable_in_game = false,
+  render_layer = "smoke",
+  pictures = { { filename = "__smart-car-control__/graphics/entities/shoot.png", width = 32, height = 32 } },
+}
+
 --
 --  TODO: Provide a different look for an automated driver
 --
@@ -139,5 +154,5 @@ local driver = {
 
 data:extend (
 {
-  recipe, item, entity, driver
+  recipe, item, entity, driver, mark
 })

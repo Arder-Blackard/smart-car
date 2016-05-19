@@ -38,16 +38,23 @@ end
 ---
 --- Displays smart car calibration properties
 ---
-smart_car_calibrations_gui = {
+SmartCarCalibrationGui = {
   ---
   --- Creates smart car calibration properties block
   ---
-  create = function( self, parent, smart_car )
-    self.smart_car = smart_car
-    self.calibration = smart_car.calibration
-    self.frame = parent.add { type = "frame", name = "calibration_frame", direction = "vertical", caption = "Calibration" }
-    self:compose_objects()
-    self.tick_handler = event_manager.on_tick( 11, function() self:update() end )
+  new = function( self, parent, smart_car )
+    local calibration_gui = {
+      smart_car = smart_car,
+      calibration = smart_car.calibration,
+      frame = parent.add { type = "frame", name = "calibration_frame", direction = "vertical", caption = "Calibration" }
+    }
+    calibration_gui.tick_handler = event_manager.on_tick( 11, function() calibration_gui:update() end )
+    self.__index = self
+    setmetatable(calibration_gui, self)
+
+    calibration_gui:compose_objects()
+
+    return calibration_gui
   end,
 
   ---
@@ -57,8 +64,8 @@ smart_car_calibrations_gui = {
     local frame = self.frame
     frame.add { type = "label", name = "calibration_status", caption = "Calibration status: " }
 
-    frame.add { type = "button", name = "calibrate_button", caption = "Calibrate this car" }
-    event_manager.on_gui_click( "calibrate_button", function() self:calibrate() end )
+--    frame.add { type = "button", name = "calibrate_button", caption = "Calibrate this car" }
+--    event_manager.on_gui_click( "calibrate_button", function() self:calibrate() end )
 
     frame.add { type = "label", name = "tank_driving", caption = "Tank driving: " }
     frame.add { type = "label", name = "acceleration", caption = "Acceleration: " }
@@ -87,27 +94,25 @@ smart_car_calibrations_gui = {
     frame.acceleration.caption = "Acceleration: " .. format_per_tick_value( self.calibration.acceleration )
     frame.braking.caption = "Braking: " .. format_per_tick_value( self.calibration.braking )
   end,
-
-  ---
-  --- Calibrates a selected car type
-  ---
-  calibrate = function( self )
-    local calibrator = active_calibrators[ self.smart_car.car.name ]
-    if not calibrator then
-      calibrator = SmartCarCalibrator:create( self.smart_car )
-      calibrator:start()
-    end
-  end
 }
 
 ---
 --- Displays smart car properties
 ---
-smart_car_gui = {
+SmartCarGui = {
+
+  new = function ( self, source )
+    if not source then
+      source = { is_enabled = false }
+    end
+    self.__index = self
+    return setmetatable( source, self )
+  end,
+
   ---
   --- Enables SmartCar GUI when player opens a smart car
   ---
-  enable = function( self, smart_car )
+  enable = function ( self, smart_car )
     self:disable()
     self.smart_car = smart_car
     self:compose_objects()
@@ -125,7 +130,7 @@ smart_car_gui = {
       direction = "vertical"
     }
 
-    smart_car_calibrations_gui:create( self.window, self.smart_car )
+    self.calibration_gui = SmartCarCalibrationGui:new( self.window, self.smart_car )
 
     self.window.add { type = "checkbox", name = "idle_mode", caption = "Idle",
                       state = self.smart_car.mode == SmartCar.mode.idle }
@@ -152,7 +157,9 @@ smart_car_gui = {
   disable = function( self )
     event_manager.clear_on_gui_click( "close_button" )
     event_manager.clear_on_tick( self.tick_handler )
-    smart_car_calibrations_gui:destroy()
+    if self.calibration_gui then
+      self.calibration_gui:destroy()
+    end
     if self.window then
       self.window.destroy()
       self.window = nil

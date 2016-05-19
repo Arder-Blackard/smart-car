@@ -1,6 +1,7 @@
 require "defines"
 require "common.helpers"
 
+local timed_coroutines = {}
 local timed_sequences = {}
 local tick_handlers = {}
 local one_time_tick_handlers = {}
@@ -43,6 +44,7 @@ local function subscribe_tick_event()
   script.on_event(
     defines.events.on_tick,
     function ( event )
+
       --  Process recurrent handlers
       for _, tick_handler in ipairs( tick_handlers ) do
         tick_handler.countdown = tick_handler.countdown - 1
@@ -51,6 +53,7 @@ local function subscribe_tick_event()
           tick_handler.countdown = tick_handler.interval
         end
       end
+
       --  Process one_time handlers
       local expired_indices = {}
       for index, tick_handler in ipairs( one_time_tick_handlers ) do
@@ -85,11 +88,30 @@ local function subscribe_tick_event()
           end
         end
       end
-
-      --  Remove expired one-time handlers
+      --  Remove expired sequences
       for i = #expired_indices, 1, -1 do
         table.remove( timed_sequences, expired_indices[i] )
       end
+
+      --  Process coroutines
+      expired_indices = {}
+      for index, handler in ipairs( timed_coroutines ) do
+        handler.countdown = handler.countdown - 1
+        if ( handler.countdown <= 0 ) then
+          local thread = handler.thread
+          local result, cowntdown = coroutine.resume(thread)
+          if result and coroutine.status( thread ) ~= "dead" then
+            handler.countdown = cowntdown or 1
+          else
+            table.insert( expired_indices, index )
+          end
+        end
+      end
+      --  Remove expired sequences
+      for i = #expired_indices, 1, -1 do
+        table.remove( timed_coroutines, expired_indices[i] )
+      end
+
     end
   )
 end
@@ -206,6 +228,13 @@ event_manager = {
       timed_sequence.current = 1
       table.insert( timed_sequences, timed_sequence )
     end
+  end,
+
+  ---
+  --- Executes a coroutine. Each 'yield <interval>' postpones the coroutine execution to <interval> ticks.
+  ---
+  execute_coroutine = function( handler )
+    table.insert( timed_coroutines, { thread = coroutine.create( handler ), countdown = 1 } )
   end,
 
   ---
