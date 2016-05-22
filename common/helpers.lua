@@ -6,6 +6,18 @@ function prnt( text )
   end
 end
 
+function prnt_table( tbl, name )
+  local t = { (name and (name .. ": ") or ""), "[ " }
+  for k,v in pairs( tbl ) do
+    t[#t+1] = tostring( k )
+    t[#t+1] =  "="
+    t[#t+1] = tostring( v )
+    t[#t+1] = "; "
+  end
+  t[#t+1] = "]"
+  prnt( table.concat( t ) )
+end
+
 function prnt_bool( value )
   if value then
     game.player.print( "true" )

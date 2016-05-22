@@ -1,6 +1,7 @@
 require "defines"
 require "common.helpers"
 
+local debug_mode = false
 local timed_coroutines = {}
 local timed_sequences = {}
 local tick_handlers = {}
@@ -16,7 +17,10 @@ local function subscribe( event, handlers )
     event,
     function ( event )
       for _, handler in ipairs( handlers ) do
-        handler( event )
+        local result, error = pcall( handler, event )
+        if not result then
+          prnt( error )
+        end
       end
     end
   )
@@ -99,11 +103,14 @@ local function subscribe_tick_event()
         handler.countdown = handler.countdown - 1
         if ( handler.countdown <= 0 ) then
           local thread = handler.thread
+          if debug_mode then prnt( "[EM]: Executing coroutine " .. tostring( thread ) ) end
           local result, cowntdown = coroutine.resume(thread)
           if result and coroutine.status( thread ) ~= "dead" then
             handler.countdown = cowntdown or 1
+            if debug_mode then prnt( "[EM]: Coroutine " .. tostring( thread ) .. " will be resumed in " .. tostring( countdown ) .. " ticks") end
           else
             table.insert( expired_indices, index )
+            if debug_mode then prnt( "[EM]: Coroutine " .. tostring( thread ) .. " has finished execution" ) end
           end
         end
       end

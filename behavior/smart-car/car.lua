@@ -2,7 +2,7 @@ require "util"
 require "defines"
 require "common.helpers"
 require "common.math2"
-require "behavior.smart-car-driver"
+require "behavior.smart-car.driver"
 
 -------------------------------------------
 --- A smart car descriptor

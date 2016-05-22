@@ -1,8 +1,8 @@
 require "defines"
 require "common.helpers"
 require "common.event-manager"
-require "behavior.smart-car-calibration"
-require "behavior.smart-car-calibrator"
+require "behavior.smart-car.calibration"
+require "behavior.smart-car.calibrator"
 require "common.math2"
 
 local function format_bool_string( value )
