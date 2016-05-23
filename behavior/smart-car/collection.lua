@@ -45,7 +45,7 @@ SmartCarsCollection = {
 
     --  Check for errors
     if car.type ~= "car" then
-      prnt( "Cannot init smart driving for a non-car object" )
+      debug( "Cannot init smart driving for a non-car object" )
       return nil
     end
 
@@ -57,7 +57,7 @@ SmartCarsCollection = {
 
     --  Check for errors
     if car.passenger then
-      prnt( "The car is not empty" )
+      debug( "The car is not empty" )
       return nil
     end
 
@@ -73,7 +73,7 @@ SmartCarsCollection = {
   remove = function ( self, car )
     local smart_car, index = self:find( car )
     if not smart_car then
-      prnt( "Cannot find the smart car" )
+      debug( "Cannot find the smart car" )
       return false
     end
     smart_car:dispose()

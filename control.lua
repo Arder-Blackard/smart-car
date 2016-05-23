@@ -29,7 +29,7 @@ function init_smart_cars_mod()
     function ( event )
       local entity = event.created_entity
       local entity_name = entity.name
-      prnt( entity_name )
+      debug( entity_name )
       if entity_name == "smart-car-controller" then
         smart_car_controller_placed( entity, game.get_player( event.player_index ) )
       elseif entity_name == "asphalt-node" then
@@ -60,7 +60,7 @@ function init_smart_cars_mod()
     defines.events.on_entity_died,
     function( event )
       local entity = event.entity
-      prnt( "Entity died: " .. entity.type .. ( entity.valid and "[valid]" or "[invalid]" ) .. ", passenger: " .. (entity.type == "car" and ( entity.passenger and entity.passenger.name or "nil" ) or "invalid" ) )
+      debug( "Entity died: " .. entity.type .. ( entity.valid and "[valid]" or "[invalid]" ) .. ", passenger: " .. (entity.type == "car" and ( entity.passenger and entity.passenger.name or "nil" ) or "invalid" ) )
       if entity.type == "car" and entity.passenger and entity.passenger.name == "smart-car-driver" then
         global.smart_cars:remove( entity )
         global.smart_cars:remove_invalid_cars()
@@ -95,6 +95,10 @@ script.on_event(
     player.insert { name = "solid-fuel", count = 50 }
     player.insert { name = "combat-shotgun", count = 1 }
     player.insert { name = "piercing-shotgun-shell", count = 50 }
+
+    draw_number( player.surface, player.position.x, player.position.y, 11 )
+    draw_number( player.surface, player.position.x + 1, player.position.y, 22, true )
+    draw_number( player.surface, player.position.x + 1, player.position.y + 1, 256, true, true )
   end
 )
 

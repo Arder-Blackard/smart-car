@@ -152,7 +152,6 @@ local driver = {
     running_sound_animation_positions = {5, 16}
 }
 
-data:extend (
-{
+data:extend {
   recipe, item, entity, driver, mark
-})
+}

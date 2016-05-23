@@ -25,6 +25,8 @@ local function create_debug_info()
   return flow
 end
 
+local last_position = {x = 0, y = 0}
+
 ---
 --- Updates debug info UI
 ---
@@ -38,10 +40,12 @@ function update_debug_info( event )
   flow.tick_display.caption = "tick: " .. tostring( event.tick )
   flow.smart_cars.caption = "smart_cars: " .. debug_info.get_smart_cars_info()
   flow.orientation.caption = "orientation: " .. (game.player.vehicle and (game.player.vehicle.orientation .. ", " ..
-                                                 util.positiontostr( math2.point_along_orientation( game.player.vehicle.position, game.player.vehicle.orientation, 10 ) ) )
-                                                or "undefined")
+                                                 util.positiontostr( math2.point_along_orientation( game.player.vehicle.position, game.player.vehicle.orientation, 10 ) ) .. ", speed: " .. tostring(game.player.vehicle.speed)  )
+                                                or "undefined" )
 
-  flow.position.caption = "position: " .. util.positiontostr( game.player.position )
+  flow.position.caption = "position: " .. util.positiontostr( game.player.position ) .. ", sp: " .. tostring( util.distance( last_position, game.player.position ) )
+  last_position = game.player.position
+
   if game.player.selected then
     flow.mouse_position.caption = "mouse position: " .. ( game.player.selected and util.positiontostr( game.player.selected.position ) or "undefined" )
     flow.mouse_orientation.caption = "mouse orientation: " .. ( game.player.selected and math2.orientation( game.player.position, game.player.selected.position  ) or "undefined" )

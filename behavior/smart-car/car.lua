@@ -266,7 +266,7 @@ SmartCar = {
       event_manager.clear_on_tick( self.tick_handler )
     end
     self.mode = mode
-    prnt( "Setting mode to " .. self.mode )
+    debug( "Setting mode to " .. self.mode )
     if mode == SmartCar.mode.follow then
       self:enable_follow_mode()
     end

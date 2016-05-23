@@ -7,7 +7,7 @@ asphalt = {
   collision_mask = { "ground-tile" },
   walking_speed_modifier = 2,
   layer = 61,
-  decorative_removal_probability = 1,
+  decorative_removal_probability = 0,
   variants =
   {
     main =

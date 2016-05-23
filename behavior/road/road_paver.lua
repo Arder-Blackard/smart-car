@@ -39,32 +39,49 @@ function road_paver.get_shift(from, to)
   return { x = shift_x, y = shift_y }
 end
 
+
+---
+---
+---
 function road_paver.pave( surface, from, to )
 
   event_manager.execute_coroutine( function()
 
-    prnt( "road_paver.pave() coroutine" )
+    debug( "road_paver.pave() coroutine" )
 
-    a_star.new( surface ):find_path( from, to, true )
+    local path = a_star.new( surface ):find_path( from, to, true )
 
     if path then
-      prnt( "Pathfinding succeded: " .. tostring( path ) )
+      debug( "Pathfinding succeded: " .. tostring( path ) )
       local tiles = {}
       for i = 1,#path do
         tiles[i] = { name = "asphalt", position = path[i] }
       end
       surface.set_tiles(tiles)
     else
-      prnt( "Path not found" )
+      debug( "Path not found" )
     end
 
   end)
 
 end
 
+
+---
+---
+---
 function road_paver.road_node_placed( entity, player )
 
   local position = entity.position
+
+  local ores = player.surface.find_entities_filtered {
+    area={ {position.x - 100, position.y - 100}, {position.x + 100, position.y + 100} },
+    name="iron-ore"
+  }
+
+  for i, v in ipairs( ores ) do
+    v.destroy()
+  end
 
   entity.destroy()
   player.insert { name = "asphalt-node" }
@@ -74,6 +91,7 @@ function road_paver.road_node_placed( entity, player )
     road_paver.last_node = position
   else
     road_paver.pave(player.surface, road_paver.last_node, position)
+    road_paver.last_node = nil
   end
 end
 

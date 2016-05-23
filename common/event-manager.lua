@@ -19,7 +19,7 @@ local function subscribe( event, handlers )
       for _, handler in ipairs( handlers ) do
         local result, error = pcall( handler, event )
         if not result then
-          prnt( error )
+          debug( error )
         end
       end
     end
@@ -103,14 +103,14 @@ local function subscribe_tick_event()
         handler.countdown = handler.countdown - 1
         if ( handler.countdown <= 0 ) then
           local thread = handler.thread
-          if debug_mode then prnt( "[EM]: Executing coroutine " .. tostring( thread ) ) end
+          if debug_mode then debug( "[EM]: Executing coroutine " .. tostring( thread ) ) end
           local result, cowntdown = coroutine.resume(thread)
           if result and coroutine.status( thread ) ~= "dead" then
             handler.countdown = cowntdown or 1
-            if debug_mode then prnt( "[EM]: Coroutine " .. tostring( thread ) .. " will be resumed in " .. tostring( countdown ) .. " ticks") end
+            if debug_mode then debug( "[EM]: Coroutine " .. tostring( thread ) .. " will be resumed in " .. tostring( countdown ) .. " ticks") end
           else
             table.insert( expired_indices, index )
-            if debug_mode then prnt( "[EM]: Coroutine " .. tostring( thread ) .. " has finished execution" ) end
+            if debug_mode then debug( "[EM]: Coroutine " .. tostring( thread ) .. " has finished execution" ) end
           end
         end
       end
@@ -142,27 +142,27 @@ event_manager = {
   ---
   on = function ( event, handler )
 
---    prnt( "Subscribing to event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
+--    debug( "Subscribing to event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
 
     --  Perform checks
 
     if not event then
-      prnt( "No event to subscribe to" )
+      debug( "No event to subscribe to" )
       return
     end
 
     if event == defines.events.on_tick then
-      prnt( "Use on_tick() to subscribe to 'on_tick' event" )
+      debug( "Use on_tick() to subscribe to 'on_tick' event" )
       return
     end
 
     if event == defines.events.on_gui_click then
-      prnt( "Use on_gui_click() to subscribe to 'on_gui_click' event" )
+      debug( "Use on_gui_click() to subscribe to 'on_gui_click' event" )
       return
     end
 
     if not handler then
-      prnt( "No handler to subscribe to an event" )
+      debug( "No handler to subscribe to an event" )
       return
     end
 
@@ -183,13 +183,13 @@ event_manager = {
   --- Subscribes 'handler' to receive notifications about the 'on_tick'
   ---
   on_tick = function( interval, handler )
---    prnt( "Subscribing to on_tick, handler: " .. tostring( handler ) .. ", interval: " .. tostring( interval ) )
+--    debug( "Subscribing to on_tick, handler: " .. tostring( handler ) .. ", interval: " .. tostring( interval ) )
     if type (interval) == "function" then
       handler = interval
       interval = 1
     end
     if not handler then
-      prnt( "No handler to subscribe to an event" )
+      debug( "No handler to subscribe to an event" )
       return
     end
     table.insert( tick_handlers, { handler = handler, interval = interval, countdown = interval } )
@@ -205,7 +205,7 @@ event_manager = {
       interval = 1
     end
     if not handler then
-      prnt( "No handler to subscribe to an event" )
+      debug( "No handler to subscribe to an event" )
       return
     end
     table.insert( one_time_tick_handlers, { handler = handler, interval = interval, countdown = interval } )
@@ -248,13 +248,13 @@ event_manager = {
   --- Subscribes 'handler' to receive notifications about the 'on_gui_click'
   ---
   on_gui_click = function( element_name, handler )
---    prnt( "Subscribing to 'on_gui_click', element_name: " .. element_name .. ", handler: " .. tostring( handler ) )
+--    debug( "Subscribing to 'on_gui_click', element_name: " .. element_name .. ", handler: " .. tostring( handler ) )
     if not element_name then
-      prnt( "No element_name to subscribe to" )
+      debug( "No element_name to subscribe to" )
       return
     end
     if not handler then
-      prnt( "No handler to subscribe to an event" )
+      debug( "No handler to subscribe to an event" )
       return
     end
     named_gui_click_handlers[element_name] = handler
@@ -266,7 +266,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'event' notifications
   ---
   clear = function ( event, handler )
---    prnt( "Unsubscribing from event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
+--    debug( "Unsubscribing from event " .. tostring( event ) .. ", handler: " .. tostring( handler ) )
     local handlers = other_handlers[event]
     if handlers then
       array_remove( handlers, handler )
@@ -277,7 +277,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'on_tick' notifications
   ---
   clear_on_tick = function ( handler )
---    prnt( "Unsubscribing from 'on_tick', handler: " .. tostring( handler ) )
+--    debug( "Unsubscribing from 'on_tick', handler: " .. tostring( handler ) )
     for index, tick_handler in ipairs( tick_handlers ) do
       if tick_handler.handler == handler then
         table.remove( tick_handlers, index )
@@ -289,7 +289,7 @@ event_manager = {
   --- Unsubscribes previously registered 'handler' from 'on_gui_click' notifications
   ---
   clear_on_gui_click = function ( element_name )
---    prnt( "Unsubscribing from 'on_gui_click', element_name: " .. tostring( element_name ) )
+--    debug( "Unsubscribing from 'on_gui_click', element_name: " .. tostring( element_name ) )
     named_gui_click_handlers[ element_name ] = nil
   end,
 

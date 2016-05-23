@@ -24,7 +24,7 @@ function surface_cache:get_cell( x, y )
   end
 
   local tile = surface.get_tile( x, y )
-  local cell = { passable = not tile.collides_with( "player-layer" ), state = 0 }
+  local cell = { state = tile.collides_with( "player-layer" ) and 3 or 0 }
   row[x] = cell
   return cell
 
@@ -32,7 +32,7 @@ end
 
 return {
   new = function( surface )
-    prnt( "  Creating surface cache. Surface: " .. surface.name )
+    debug( "  Creating surface cache. Surface: " .. surface.name )
     return setmetatable( { surface = surface }, surface_cache )
   end
 }
