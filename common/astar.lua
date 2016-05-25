@@ -88,6 +88,8 @@ function a_star:find_path( from, to, coroutine_mode )
   local to_x = math.floor( to.x )
   local to_y = math.floor( to.y )
 
+  local road_width = 3
+
   --  Store local references
   local h
   if global.astar_distance_type == "manhattan_distance" then
@@ -119,7 +121,7 @@ function a_star:find_path( from, to, coroutine_mode )
   open:push( first_node )
 
   --  Put in the matching cell
-  local first_cell = surf_cache:get_cell( from_x, from_y )
+  local first_cell = surf_cache:get_cell( from_x, from_y, road_width )
   first_cell.g = 0    --  first_node.g
 
   --  Will be filled in if the search succeeds
@@ -141,9 +143,9 @@ function a_star:find_path( from, to, coroutine_mode )
 
 --    debug_table( curr_node, "curr_node" )
 
-    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.g )
-    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.h, true )
-    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.f, false, true )
+--    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.g )
+--    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.h, true )
+--    draw_number( self.surface, curr_node.x, curr_node.y, curr_node.f, false, true )
 
     --  Check whether we have reached the target
     if curr_node.x == to_x and curr_node.y == to_y then
@@ -153,7 +155,7 @@ function a_star:find_path( from, to, coroutine_mode )
     end
 
     --  Get matching cell
-    local curr_cell = surf_cache:get_cell( curr_node.x, curr_node.y )
+    local curr_cell = surf_cache:get_cell( curr_node.x, curr_node.y, road_width )
 
 --    debug_table( curr_cell, "curr_cell" )
 
@@ -171,9 +173,9 @@ function a_star:find_path( from, to, coroutine_mode )
         local succ_y = curr_node.y + succ.dy
 
         --  Get successor cell
-        local succ_cell = surf_cache:get_cell( succ_x, succ_y )
+        local succ_cell = surf_cache:get_cell( succ_x, succ_y, road_width )
 
---        debug_table( succ_cell, "succ_cell" )
+--        debug_table( succ_cell, "succ_cell[".. dir .."]" )
 
         --  Skip impassable cells
         local succ_cell_state = succ_cell.state
@@ -186,7 +188,7 @@ function a_star:find_path( from, to, coroutine_mode )
           local succ_g = curr_node.g + succ.dg
 
           local succ_penalty = curr_node.dir and ((math.abs(curr_node.dir - dir) % successors_count) * penalty) or 0
-          debug(  (curr_node.dir and curr_node.dir or "nil").. "->" .. dir .. ": " .. succ_penalty  )
+--          debug(  (curr_node.dir and curr_node.dir or "nil").. "->" .. dir .. ": " .. succ_penalty  )
 
           local succ_node = node:new(succ_x, succ_y, succ_g + succ_penalty, h(succ_x, succ_y, to_x, to_y) * 10, curr_node, dir )
 
@@ -203,7 +205,7 @@ function a_star:find_path( from, to, coroutine_mode )
           local succ_penalty = curr_node.dir and ((math.abs(curr_node.dir - dir) % successors_count) * penalty) or 0
           if succ_g + succ_penalty < succ_cell.g then
 
-            debug( "Wow! So optimizations! Much " .. succ_cell.g .. " to " .. succ_g + succ_penalty )
+--            debug( "Wow! So optimizations! Much " .. succ_cell.g .. " to " .. succ_g + succ_penalty )
 
             local index, succ_node = open:find( succ_x, succ_y )
             assert( succ_node ~= nil )

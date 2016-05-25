@@ -52,13 +52,32 @@ function road_paver.pave( surface, from, to )
     local path = a_star.new( surface ):find_path( from, to, true )
 
     if path then
-      debug( "Pathfinding succeded: " .. tostring( path ) )
---      local tiles = {}
-      for i = 1,#path do
---        tiles[i] = { name = "asphalt", position = path[i] }
-        surface.create_entity{ name = "small-lamp", position = path[i] }
+      debug( "Pathfinding succeded: " .. tostring( #path ) .. " nodes" )
+
+      local tiles = {}
+
+      local res, err = true, nil
+
+--      pcall( function()
+
+        for i = 1,#path do
+
+          for dy = -3,3 do
+            for dx = -3,3 do
+              tiles[#tiles + 1] = { name = "asphalt", position = { path[i].x + dx, path[i].y + dy } }
+            end
+          end
+
+  --        surface.create_entity{ name = "small-lamp", position = path[i] }
+        end
+--      end )
+
+      if not res then
+        debug ( tostring ( err ) )
+      else
+        debug( "Tiles: " .. #tiles )
+        surface.set_tiles( tiles )
       end
---      surface.set_tiles(tiles)
 
     else
       debug( "Path not found" )
