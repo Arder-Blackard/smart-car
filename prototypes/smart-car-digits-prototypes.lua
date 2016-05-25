@@ -6,7 +6,7 @@ local function define_digit( digit )
     selectable_in_game = false,
     collision_box = { {-0.1, -0.1}, {0.1, 0.1} },
     collision_mask = {"not-colliding-with-itself"},
-    render_layer = "decorative",
+    render_layer = "smoke",
     pictures =
     {
       filename = "__smart-car-control__/graphics/gui/digits.png",

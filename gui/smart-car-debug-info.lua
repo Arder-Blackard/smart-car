@@ -20,7 +20,61 @@ local function create_debug_info()
   flow.add { type = "label", name = "position", caption = "position" }
   flow.add { type = "label", name = "mouse_position", caption = "mouse position" }
   flow.add { type = "label", name = "mouse_orientation", caption = "mouse orientation" }
-  flow.add { type = "checkbox", name = "can_place", caption = "can_place_entity", state = false }
+
+  local astar_d_flow = flow.add { type = "flow", name = "astar_d_flow", direction = "horizontal" }
+  astar_d_flow.add { type = "label", name = "d1_label", caption = "D1: " }
+  astar_d_flow.add { type = "textfield", name = "d1_text", text = "1" }
+  astar_d_flow.add { type = "label", name = "d2_label", caption = "D2: " }
+  astar_d_flow.add { type = "textfield", name = "d2_text", text = "1" }
+
+  local astar_dist_flow = flow.add { type = "flow", name = "astar_dist_flow",  direction = "horizontal" }
+
+  astar_dist_flow.add { type = "checkbox", name = "manhattan_distance", caption = "Manhattan dist.", state = false }
+  astar_dist_flow.add { type = "checkbox", name = "diagonal_distance", caption = "Diagonal dist.", state = false }
+  astar_dist_flow.add { type = "checkbox", name = "euclide_distance", caption = "Euclide dist.", state = false }
+
+  local function distance_checkbox_click( event )
+    local element_name = event.element.name
+    flow.astar_dist_flow.manhattan_distance.state = ( element_name == "manhattan_distance" )
+    flow.astar_dist_flow.diagonal_distance.state = ( element_name == "diagonal_distance" )
+    flow.astar_dist_flow.euclide_distance.state = ( element_name == "euclide_distance" )
+    global.astar_distance_type = element_name
+  end
+
+  event_manager.on_gui_click( "manhattan_distance", distance_checkbox_click )
+  event_manager.on_gui_click( "diagonal_distance", distance_checkbox_click )
+  event_manager.on_gui_click( "euclide_distance", distance_checkbox_click )
+
+  local astar_turn_flow = flow.add { type = "flow", name = "astar_turn_flow", direction = "horizontal" }
+  astar_turn_flow.add { type = "label", name = "str_label", caption = "Turn penalty: " }
+  astar_turn_flow.add { type = "textfield", name = "turn_penalty_text", text = "0" }
+
+
+  local astar_clear_flow = flow.add { type = "flow", name = "astar_clear_flow",  direction = "horizontal" }
+
+  astar_clear_flow.add { type = "button", name = "clear_numbers", caption = "Clear numbers" }
+  astar_clear_flow.add { type = "button", name = "clear_road", caption = "Clear lamps" }
+
+  event_manager.on_gui_click( "clear_numbers", function( event )
+    local player = game.players[event.player_index]
+    local pos = player.position
+    local decoratives = player.surface.find_entities_filtered {
+      area={ {pos.x - 300, pos.y - 300}, {pos.x + 300, pos.y + 300} },
+      type="decorative"
+    }
+    for _, v in ipairs( decoratives ) do v.destroy() end
+  end )
+
+
+  event_manager.on_gui_click( "clear_road", function( event )
+    local player = game.players[event.player_index]
+    local pos = player.position
+    local decoratives = player.surface.find_entities_filtered {
+      area={ {pos.x - 300, pos.y - 300}, {pos.x + 300, pos.y + 300} },
+      name="small-lamp"
+    }
+    for _, v in ipairs( decoratives ) do v.destroy() end
+  end )
 
   return flow
 end
@@ -31,11 +85,17 @@ local last_position = {x = 0, y = 0}
 --- Updates debug info UI
 ---
 function update_debug_info( event )
-  local flow =  game.player.gui.top.smart_car_debug_info
 
+  local flow =  game.player.gui.top.smart_car_debug_info
   if not flow then
     flow = create_debug_info()
   end
+
+  local astar_d_flow = flow.astar_d_flow
+
+  global.astar_d1 = tonumber( astar_d_flow.d1_text.text ) or 1
+  global.astar_d2 = tonumber( astar_d_flow.d2_text.text ) or 1
+  global.astar_turn_penalty = tonumber( flow.astar_turn_flow.turn_penalty_text.text ) or 0
 
   flow.tick_display.caption = "tick: " .. tostring( event.tick )
   flow.smart_cars.caption = "smart_cars: " .. debug_info.get_smart_cars_info()
@@ -49,15 +109,6 @@ function update_debug_info( event )
   if game.player.selected then
     flow.mouse_position.caption = "mouse position: " .. ( game.player.selected and util.positiontostr( game.player.selected.position ) or "undefined" )
     flow.mouse_orientation.caption = "mouse orientation: " .. ( game.player.selected and math2.orientation( game.player.position, game.player.selected.position  ) or "undefined" )
-  end
-
-  if flow.can_place.state then
-    local player = game.player
-    local surf = player.surface
-    local entity = { name = "tank", position = { player.position.x, player.position.y + 20 } }
-    for _ = 1, 1000 do
-      surf.can_place_entity( entity )
-    end
   end
 end
 

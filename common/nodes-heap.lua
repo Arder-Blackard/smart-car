@@ -148,6 +148,6 @@ end
 
 return {
   new = function()
-    return setmetatable( { heap = {} }, nodes_heap)
+    return setmetatable( { heap = {} }, nodes_heap )
   end
 }

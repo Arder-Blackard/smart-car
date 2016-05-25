@@ -53,11 +53,13 @@ function road_paver.pave( surface, from, to )
 
     if path then
       debug( "Pathfinding succeded: " .. tostring( path ) )
-      local tiles = {}
+--      local tiles = {}
       for i = 1,#path do
-        tiles[i] = { name = "asphalt", position = path[i] }
+--        tiles[i] = { name = "asphalt", position = path[i] }
+        surface.create_entity{ name = "small-lamp", position = path[i] }
       end
-      surface.set_tiles(tiles)
+--      surface.set_tiles(tiles)
+
     else
       debug( "Path not found" )
     end
@@ -73,15 +75,6 @@ end
 function road_paver.road_node_placed( entity, player )
 
   local position = entity.position
-
-  local ores = player.surface.find_entities_filtered {
-    area={ {position.x - 100, position.y - 100}, {position.x + 100, position.y + 100} },
-    name="iron-ore"
-  }
-
-  for i, v in ipairs( ores ) do
-    v.destroy()
-  end
 
   entity.destroy()
   player.insert { name = "asphalt-node" }
