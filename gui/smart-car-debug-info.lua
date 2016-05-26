@@ -29,7 +29,8 @@ local function create_debug_info()
 
   local astar_dist_flow = flow.add { type = "flow", name = "astar_dist_flow",  direction = "horizontal" }
 
-  astar_dist_flow.add { type = "checkbox", name = "manhattan_distance", caption = "Manhattan dist.", state = false }
+  global.astar_distance_type = "manhattan_distance"
+  astar_dist_flow.add { type = "checkbox", name = "manhattan_distance", caption = "Manhattan dist.", state = true }
   astar_dist_flow.add { type = "checkbox", name = "diagonal_distance", caption = "Diagonal dist.", state = false }
   astar_dist_flow.add { type = "checkbox", name = "euclide_distance", caption = "Euclide dist.", state = false }
 
@@ -53,7 +54,7 @@ local function create_debug_info()
   local astar_clear_flow = flow.add { type = "flow", name = "astar_clear_flow",  direction = "horizontal" }
 
   astar_clear_flow.add { type = "button", name = "clear_numbers", caption = "Clear numbers" }
-  astar_clear_flow.add { type = "button", name = "clear_road", caption = "Clear lamps" }
+  astar_clear_flow.add { type = "button", name = "clear_road", caption = "Clear road" }
 
   event_manager.on_gui_click( "clear_numbers", function( event )
     local player = game.players[event.player_index]

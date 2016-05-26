@@ -1,3 +1,4 @@
+require "util"
 require "defines"
 require "common.helpers"
 
@@ -39,6 +40,65 @@ function road_paver.get_shift(from, to)
   return { x = shift_x, y = shift_y }
 end
 
+local function is_diagonal_move( pos1, pos2 )
+  debug( ( pos1 and util.positiontostr( pos1 ) or "nil") .. " -> " .. ( pos2 and util.positiontostr( pos2 ) or "nil" ) )
+  if not pos1 or not pos2 then
+    return false
+  end
+  return pos1.x ~= pos2.x and pos1.y ~= pos2.y
+end
+
+local road_node = {
+  [1] = {
+    [1] = {
+      origin = { 0, 3 },
+      pattern = { "ooooooo" }
+    },
+    [2] = {
+      origin = { 3, 3 },
+      pattern = {
+        "  o    ",
+        " ooo   ",
+        "ooooo  ",
+        "oooooo ",
+      }
+    },
+    [3] = {
+      origin = { 3, 3 },
+      pattern = {
+        "oooo",
+        "oooo",
+        "oooo",
+        "oooo",
+      }
+    }
+  },
+  [2] = {
+    [1] = {
+      origin = { 0, 0 },
+      pattern = {
+        "oooo",
+        " ooo",
+        "  o ",
+      }
+    },
+    [1] = {
+      origin = { 1, 4 },
+      pattern = { "ooooooo" }
+    },
+
+    [3] = {
+      origin = { 4, 4 },
+      pattern = {
+        "oooo",
+        "oooo",
+        "oooo",
+        "oooo",
+      }
+    }
+  },
+}
+
 
 ---
 ---
@@ -56,28 +116,24 @@ function road_paver.pave( surface, from, to )
 
       local tiles = {}
 
-      local res, err = true, nil
+      local prev_path_node
+      for i = 1,#path do
+--
+          local path_node = path[i]
+          local diagonal = path_node.dir and (path_node.dir % 2 == 0)
+          local road_width = diagonal and 2 or 3
 
---      pcall( function()
-
-        for i = 1,#path do
-
-          for dy = -3,3 do
-            for dx = -3,3 do
-              tiles[#tiles + 1] = { name = "asphalt", position = { path[i].x + dx, path[i].y + dy } }
+          for dy = -road_width,road_width do
+            for dx = -road_width,road_width do
+              tiles[#tiles + 1] = { name = "asphalt", position = { path_node.x + dx, path_node.y + dy } }
             end
           end
 
-  --        surface.create_entity{ name = "small-lamp", position = path[i] }
-        end
---      end )
+        surface.create_entity{ name = "small-lamp", position = path[i] }
+      end
 
-      if not res then
-        debug ( tostring ( err ) )
-      else
         debug( "Tiles: " .. #tiles )
         surface.set_tiles( tiles )
-      end
 
     else
       debug( "Path not found" )

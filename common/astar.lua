@@ -255,7 +255,7 @@ function a_star:find_path( from, to, coroutine_mode )
 
   while last_node do
     path_size = path_size + 1
-    path_reversed[path_size] = { x = last_node.x, y = last_node.y }
+    path_reversed[path_size] = { x = last_node.x, y = last_node.y, dir = last_node.dir }
     last_node = last_node.prev
   end
 
