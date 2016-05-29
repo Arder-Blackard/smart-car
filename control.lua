@@ -8,7 +8,7 @@ require "gui.smart-car-debug-info"
 require "common.helpers"
 require "common.event-manager"
 
-local road_paver = require "behavior.road.road_paver"
+local road_paver = require "behavior.road.road-paver"
 
 ---
 --- Inits smart cars data structures

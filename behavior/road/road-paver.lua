@@ -2,7 +2,7 @@ require "util"
 require "defines"
 require "common.helpers"
 
-local a_star = require "common.astar"
+local a_star = require "behavior.pathing.a-star"
 
 local function sign(value)
   return value > 0 and 1 or -1
