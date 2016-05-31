@@ -125,13 +125,13 @@ function a_star:find_path( from, to, coroutine_mode )
   first_cell.g = 0    --  first_node.g
 
   --  Will be filled in if the search succeeds
-  local last_node
+  local target_node
 
   --  ------------  --
   --  Start search  --
   --  ------------  --
   local step = 0
-  while not open:is_empty() do
+  while not open:is_empty() and step < 100000 do
 
     step = step + 1
 --    debug( "Step " .. step )
@@ -149,7 +149,7 @@ function a_star:find_path( from, to, coroutine_mode )
 
     --  Check whether we have reached the target
     if curr_node.x == to_x and curr_node.y == to_y then
-      last_node = curr_node
+      target_node = curr_node
       debug( "Found target" )
       break;
     end
@@ -180,8 +180,6 @@ function a_star:find_path( from, to, coroutine_mode )
         --  Skip impassable cells
         local succ_cell_state = succ_cell.state
 
-        local _, err = pcall( function()
-
         --  For a new cell - add to open list
         if succ_cell_state == 0 then
 
@@ -197,7 +195,6 @@ function a_star:find_path( from, to, coroutine_mode )
           open:push(succ_node)
           succ_cell.state = 1
           succ_cell.g = succ_g
-
 
         --  For an open cell - update if more optimal path was found
         elseif succ_cell_state == 1 then
@@ -222,18 +219,9 @@ function a_star:find_path( from, to, coroutine_mode )
 --            debug( step .. ". " .. tostring( open ) )
 --            debug( "Wow! Much hippyfied " )
           end
-
         end
-
-        end)
-
-        debug( tostring( err ))
-
       end
-
     end
-
---    debug( "Iteration finished" )
 
     if step % 1000 == 0 then
       debug( step )
@@ -242,21 +230,32 @@ function a_star:find_path( from, to, coroutine_mode )
     if coroutine_mode and step % 250 == 0 then
       coroutine.yield( 2 )
     end
-
   end
 
-  --  restore path or return fail
-  if not last_node then
+  return self:restore_path( target_node )
+end
+
+---
+--- Return restored path or return fail
+---
+function a_star:restore_path( target_node )
+
+  if not target_node then
     return nil
   end
 
   local path_reversed = {}
   local path_size = 0
 
-  while last_node do
-    path_size = path_size + 1
-    path_reversed[path_size] = { x = last_node.x, y = last_node.y, dir = last_node.dir }
-    last_node = last_node.prev
+  local last_dir = 0
+
+  while target_node do
+    if target_node.dir ~= last_dir then
+      path_size = path_size + 1
+      path_reversed[path_size] = { x = target_node.x, y = target_node.y, dir = target_node.dir }
+      last_dir = target_node.dir
+    end
+    target_node = target_node.prev
   end
 
   local path = {}
@@ -267,7 +266,6 @@ function a_star:find_path( from, to, coroutine_mode )
 
   return path
 end
-
 
 
 return {

@@ -69,6 +69,18 @@ math2 = {
     else
       return orientation + 0.5
     end
+  end,
+
+  sign = function ( value )
+    if value > 0 then
+      return 1
+    elseif value < 0 then
+      return -1
+    else
+      return 0
+    end
   end
+
 }
 
+return math2
