@@ -1,13 +1,18 @@
 require "util"
 require "defines"
-require "common.helpers"
+require "scripts.common.helpers"
 
-local math2 = require "common.math2"
-local a_star = require "behavior.pathing.a-star"
+local math2 = require "scripts.common.math2"
+local a_star = require "scripts.pathing.a-star"
+local behavior = "scripts.smart-car.behavior"
 
 local road_paver = {}
 
+---
+--- Puts a road patch on the surface
+---
 function road_paver.place_road(surface, position, road_lane_width)
+
   --  Prepare tiles
   local tiles = {}
   for row = -road_lane_width, road_lane_width do
@@ -17,6 +22,8 @@ function road_paver.place_road(surface, position, road_lane_width)
   end
   surface.set_tiles(tiles)
 end
+
+--[[
 
 function road_paver.get_shift(from, to)
   local dx = to.x - from.x
@@ -94,6 +101,7 @@ local road_node = {
     }
   },
 }
+]]
 
 ---
 ---
@@ -117,6 +125,7 @@ function road_paver.pave( surface, from, to )
     local path = a_star.new( surface ):find_path( from, to, true )
 
     if path then
+
       debug( "Pathfinding succeded: " .. tostring( #path ) .. " nodes" )
 
       local tiles = {}
@@ -125,7 +134,7 @@ function road_paver.pave( surface, from, to )
 
         local path_node = path[i]
         local diagonal = path_node.dir and (path_node.dir % 2 == 0)
-        local road_width = diagonal and 3 or 2
+        local road_width = diagonal and 2 or 1
 
         local patch_x = path_node.x
         local patch_y = path_node.y
@@ -134,15 +143,8 @@ function road_paver.pave( surface, from, to )
         local target_x = next_node.x
         local target_y = next_node.y
 
-        debug( " Road from {" .. patch_x .. " ," .. patch_y .. "} to {" .. target_x .. " ," .. target_y .. "}" )
-
-          debug( "target_x - patch_x: " .. tostring (target_x - patch_x) )
-          debug( "target_y - patch_y: " .. tostring (target_y - patch_y) )
-          debug( "math2.sign( target_x - patch_x ): " .. tostring (math2.sign( target_x - patch_x )) )
-
-          local dx = math2.sign( target_x - patch_x )
-          local dy = math2.sign( target_y - patch_y )
-          debug( "  delta: {" .. tostring( dx ) .. " ," .. tostring ( dy ) .. "}" )
+        local dx = math2.sign( target_x - patch_x )
+        local dy = math2.sign( target_y - patch_y )
 
         while patch_x ~= target_x or patch_y ~= target_y do
           place_patch( tiles, patch_x, patch_y, road_width )
@@ -151,12 +153,15 @@ function road_paver.pave( surface, from, to )
         end
         place_patch( tiles, patch_x, patch_y, road_width )
 
-
-        surface.create_entity{ name = "small-lamp", position = path[i] }
+--        surface.create_entity{ name = "small-lamp", position = path[i] }
       end
 
       debug( "Tiles: " .. #tiles )
       surface.set_tiles( tiles )
+
+      if global.smart_car then
+        global.smart_car:set_behavior(  )
+      end
 
     else
       debug( "Path not found" )

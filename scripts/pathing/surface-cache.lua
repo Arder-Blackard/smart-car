@@ -1,4 +1,4 @@
-require "common.helpers"
+require "scripts.common.helpers"
 
 local surface_cache = {}
 surface_cache.__index = surface_cache

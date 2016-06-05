@@ -1,5 +1,5 @@
 require "defines"
-require "common.helpers"
+require "scripts.common.helpers"
 
 local debug_mode = false
 local timed_coroutines = {}

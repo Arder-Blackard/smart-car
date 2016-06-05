@@ -1,6 +1,4 @@
-local table = table
-local algorithm = require "common.algorithm"
-
+local algorithm = require "scripts.common.algorithm"
 
 if global.road_network then
   return global.road_network

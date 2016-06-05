@@ -1,6 +1,6 @@
 require "util"
-require "common.helpers"
-require "common.math2"
+require "scripts.common.helpers"
+local math2 = require "scripts.common.math2"
 
 local debug_info = {}
 

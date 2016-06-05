@@ -1,9 +1,10 @@
 require "defines"
-require "common.helpers"
-require "common.event-manager"
-require "behavior.smart-car.calibration"
-require "behavior.smart-car.calibrator"
-require "common.math2"
+require "scripts.common.helpers"
+require "scripts.common.event-manager"
+local SmartCar = require "scripts.smart-car.car"
+local SmartCarCalibration = require "scripts.smart-car.calibration"
+local SmartCarCalibrator = require "scripts.smart-car.calibrator"
+local math2 = require "scripts.common.math2"
 
 local function format_bool_string( value )
   if value == nil then

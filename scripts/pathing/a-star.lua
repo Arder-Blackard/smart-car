@@ -1,6 +1,6 @@
-require "common.helpers"
-local nodes_heap = require "behavior.pathing.nodes-heap"
-local surface_cache = require "behavior.pathing.surface-cache"
+require "scripts.common.helpers"
+local nodes_heap = require "scripts.pathing.nodes-heap"
+local surface_cache = require "scripts.pathing.surface-cache"
 
 ---
 --- A single path node
