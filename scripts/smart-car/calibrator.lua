@@ -11,12 +11,18 @@ function smart_car_calibrator:start()
   event_manager.execute_coroutine (
     function()
 
-      self.initial_orientation = self.smart_car.car.orientation
+      local initial_orientation = self.smart_car.car.orientation
       self.smart_car.driver:turn_left()
       coroutine.yield( 5 )
 
       --  Test 'tank_driving' property
-      self.calibration.tank_driving = not ( self.initial_orientation == self.smart_car.car.orientation )
+      if initial_orientation ~= self.smart_car.car.orientation then
+        self.calibration.tank_driving = true
+        self.calibration.rotation = math.abs( self.smart_car.car.orientation - initial_orientation )
+      else
+        self.calibration.tank_driving = false
+      end
+
       self.smart_car.driver:turn_right()
       coroutine.yield( 5 )
 
@@ -28,8 +34,14 @@ function smart_car_calibrator:start()
 
       --  Test acceleration estimate
       self.calibration.acceleration = self.smart_car.car.speed / 4
+      if not self.calibration.tank_driving then
+        self.smart_car.driver:turn_left()
+      end
       coroutine.yield( 4 )
 
+      if not self.calibration.tank_driving then
+        self.calibration.rotation = math.abs( self.smart_car.car.orientation - initial_orientation )
+      end
       self.initial_speed = self.smart_car.car.speed
       self.smart_car.driver:brake()
       coroutine.yield( 4 )

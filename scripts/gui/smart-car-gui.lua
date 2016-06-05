@@ -71,6 +71,7 @@ SmartCarCalibrationGui = {
     frame.add { type = "label", name = "tank_driving", caption = "Tank driving: " }
     frame.add { type = "label", name = "acceleration", caption = "Acceleration: " }
     frame.add { type = "label", name = "braking", caption = "Braking: " }
+    frame.add { type = "label", name = "rotation", caption = "Rotation: " }
   end,
 
   ---
@@ -94,6 +95,7 @@ SmartCarCalibrationGui = {
     frame.tank_driving.caption = "Tank driving: " .. format_bool_string( self.calibration.tank_driving )
     frame.acceleration.caption = "Acceleration: " .. format_per_tick_value( self.calibration.acceleration )
     frame.braking.caption = "Braking: " .. format_per_tick_value( self.calibration.braking )
+    frame.rotation.caption = "Rotation: " .. format_per_tick_value( self.calibration.rotation )
   end,
 }
 
@@ -133,12 +135,6 @@ SmartCarGui = {
 
     self.calibration_gui = SmartCarCalibrationGui:new( self.window, self.smart_car )
 
-    self.window.add { type = "checkbox", name = "idle_mode", caption = "Idle",
-                      state = self.smart_car.mode == SmartCar.mode.idle }
-    event_manager.on_gui_click( "idle_mode", function() self.smart_car:set_mode( SmartCar.mode.idle ) end )
-    self.window.add { type = "checkbox", name = "follow_mode", caption = "Follow me",
-                      state = self.smart_car.mode == SmartCar.mode.follow }
-    event_manager.on_gui_click( "follow_mode", function() self.smart_car:set_mode( SmartCar.mode.follow ) end )
 
     self.window.add { type = "button", name = "close_button", caption = "Close" }
     self.tick_handler = event_manager.on_tick( 11, function() self:update() end)
@@ -146,10 +142,6 @@ SmartCarGui = {
   end,
 
   update = function( self )
-    if self.window then
-      self.window.idle_mode.state = self.smart_car.mode == SmartCar.mode.idle
-      self.window.follow_mode.state = self.smart_car.mode == SmartCar.mode.follow
-    end
   end,
 
   ---

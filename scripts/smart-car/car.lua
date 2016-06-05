@@ -33,7 +33,9 @@ function smart_car:new( car, player )
   setmetatable( instance, smart_car )
 
   instance.tick_handler = function( event ) smart_car.tick_handler( instance, event ) end
-  instance:after_calibration( instance.tick_handler )
+  instance:after_calibration( function() event_manager.on_tick( 3, instance.tick_handler ) end )
+
+  global.smart_car = instance
 
   return instance
 end
@@ -56,6 +58,9 @@ function smart_car:tick_handler ( event )
   if not self.car.valid then
     global.smart_cars:remove( self )
   else
+
+--    debug( "smart_car:tick_handler(" .. event.tick .. ")" )
+
     local behavior = self.behavior
     if behavior then
       behavior:update( event )
@@ -119,6 +124,17 @@ end
 
 
 ---
+--- Checks whether braking is required.
+---
+function smart_car:is_braking_required( distance_sqr )
+  local braking_distance = self:get_braking_distance()
+  return (distance_sqr <= braking_distance * braking_distance)
+  --         or self:detect_obstacle( braking_distance, self:get_motion_orientation() )
+end
+
+
+
+---
 ---
 ---
 function smart_car:get_closest_direction()
@@ -164,21 +180,13 @@ end
 
 
 ---
---- Checks whether braking is required.
----
-function smart_car:is_braking_required( distance_sqr )
-  local braking_distance = self:get_braking_distance()
-  return (distance_sqr <= braking_distance * braking_distance)
-         or self:detect_obstacle( braking_distance, self:get_motion_orientation() )
-end
-
-
----
 --- Sets smart_car behavior
 ---
 function smart_car:set_behavior( behavior )
   self.behavior = behavior
-  behavior.smart_car = self
+  if behavior then
+    behavior.smart_car = self
+  end
 end
 
 

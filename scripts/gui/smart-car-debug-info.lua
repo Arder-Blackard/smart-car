@@ -29,7 +29,7 @@ local function create_debug_info()
 
   local astar_dist_flow = flow.add { type = "flow", name = "astar_dist_flow",  direction = "horizontal" }
 
-  global.astar_distance_type = "manhattan_distance"
+  global.astar_distance_type = "diagonal_distance"
   astar_dist_flow.add { type = "checkbox", name = "manhattan_distance", caption = "Manhattan dist.", state = true }
   astar_dist_flow.add { type = "checkbox", name = "diagonal_distance", caption = "Diagonal dist.", state = false }
   astar_dist_flow.add { type = "checkbox", name = "euclide_distance", caption = "Euclide dist.", state = false }
@@ -96,7 +96,7 @@ function update_debug_info( event )
 
   global.astar_d1 = tonumber( astar_d_flow.d1_text.text ) or 1
   global.astar_d2 = tonumber( astar_d_flow.d2_text.text ) or 1
-  global.astar_turn_penalty = tonumber( flow.astar_turn_flow.turn_penalty_text.text ) or 0
+  global.astar_turn_penalty = tonumber( flow.astar_turn_flow.turn_penalty_text.text ) or 7
 
   flow.tick_display.caption = "tick: " .. tostring( event.tick )
   flow.smart_cars.caption = "smart_cars: " .. debug_info.get_smart_cars_info()

@@ -4,7 +4,8 @@ require "scripts.common.helpers"
 
 local math2 = require "scripts.common.math2"
 local a_star = require "scripts.pathing.a-star"
-local behavior = "scripts.smart-car.behavior"
+local smart_car_behavior = require "scripts.smart-car.behavior"
+local RoadPath = require "scripts.road.road-path"
 
 local road_paver = {}
 
@@ -159,8 +160,10 @@ function road_paver.pave( surface, from, to )
       debug( "Tiles: " .. #tiles )
       surface.set_tiles( tiles )
 
+      local road_path = RoadPath.new( path )
+
       if global.smart_car then
-        global.smart_car:set_behavior(  )
+        global.smart_car:set_behavior( smart_car_behavior.new( "follow-road", road_path ) )
       end
 
     else

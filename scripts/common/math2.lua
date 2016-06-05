@@ -28,7 +28,7 @@ function math2.orientation_to_radians( orientation )
 end
 
 function math2.rotation_direction( orientation_delta, epsilon )
-  epsilon = epsilon or 0.01
+  epsilon = epsilon or 0.001
   if orientation_delta < epsilon and orientation_delta > -epsilon then
     return defines.riding.direction.straight
   elseif orientation_delta > 0 then
@@ -52,6 +52,12 @@ function math2.distance_sqr( from, to )
   local dx = from.x - to.x
   local dy = from.y - to.y
   return dx * dx + dy * dy
+end
+
+function math2.distance( from, to )
+  local dx = from.x - to.x
+  local dy = from.y - to.y
+  return (dx * dx + dy * dy) ^ 0.5
 end
 
 function math2.point_along_orientation( position, orientation, distance )
